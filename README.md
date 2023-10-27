@@ -1,4 +1,4 @@
-# BELMA: Blockchain-Enhanced Language Model Framework for Smart Contract Security
+# BELMA: Blockchain-Enhanced Language Model Approach for Smart Contract Security
 
 ## Introduction
 
