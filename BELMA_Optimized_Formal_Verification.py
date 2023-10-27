@@ -20,9 +20,9 @@ def filter_states(S_prime):
     # For demonstration, let's filter out states that contain '1'
     return [s for s in S_prime if '1' not in s]
 
-def belmf_optimized_formal_verification(S, P):
+def belma_optimized_formal_verification(S, P):
     """
-    BELMF Optimized Formal Verification Algorithm
+    BELMA Optimized Formal Verification Algorithm
     
     Parameters:
     S (str): Smart Contract Code
@@ -61,5 +61,5 @@ def belmf_optimized_formal_verification(S, P):
 # Example usage
 S = "Smart Contract Code Here"
 P = "Property to be Verified"
-result = belmf_optimized_formal_verification(S, P)
+result = BELMA_optimized_formal_verification(S, P)
 print(result)
