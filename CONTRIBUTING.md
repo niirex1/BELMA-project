@@ -1,8 +1,8 @@
-# Contributing to BELMF: Blockchain-Enhanced Language Model Framework
+# Contributing to BELMA: Blockchain-Enhanced Language Model Framework
 
 ## Introduction
 
-Thank you for your interest in contributing to BELMF, a comprehensive security solution for smart contract vulnerability detection and repair on blockchain platforms. Your contributions can help make the framework more robust, efficient, and user-friendly.
+Thank you for your interest in contributing to BELMA, a comprehensive security solution for smart contract vulnerability detection and repair on blockchain platforms. Your contributions can help make the framework more robust, efficient, and user-friendly.
 
 ## Code of Conduct
 
@@ -12,7 +12,7 @@ We expect all contributors to adhere to the [Code of Conduct](CODE_OF_CONDUCT.md
 
 ### Reporting Issues
 
-1. Check if the issue already exists in the [Issues](https://github.com/yourusername/BELMF/issues) section.
+1. Check if the issue already exists in the [Issues](https://github.com/yourusername/BELMA/issues) section.
 2. If not, create a new issue, providing a detailed description and steps to reproduce the issue.
 
 ### Feature Requests
@@ -47,8 +47,8 @@ All contributors will be acknowledged in the project's documentation.
 
 ## License
 
-By contributing to BELMF, you agree that your contributions will be licensed under the same license as the original project. See [LICENSE](LICENSE.md) for more information.
+By contributing to BELMA, you agree that your contributions will be licensed under the same license as the original project. See [LICENSE](LICENSE.md) for more information.
 
 ---
 
-For any questions or clarifications, feel free to reach out to the project maintainers. Thank you for contributing to BELMF!
+For any questions or clarifications, feel free to reach out to the project maintainers. Thank you for contributing to BELMA!
