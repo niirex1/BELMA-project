@@ -51,6 +51,12 @@ Before you begin, ensure you have the following installed:
    pip install -r requirements.txt
    ```
 
+4. **Install Required Python Packages**
+
+   ```bash
+   pip install openai
+   ```
+
 ### Running BELMA
 
 Please refer to the `example_usage.ipynb` notebook for a detailed guide on how to use the framework for smart contract vulnerability detection and repair.
