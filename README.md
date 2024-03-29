@@ -1,4 +1,4 @@
-# BELMA: Blockchain-Enhanced Language Model Approach for Smart Contract Security
+# BELMA: An Optimized Dual-Layer Approach for Smart Contract Vulnerability Repair via Formal Verification and Machine Learning
 
 ## Introduction
 
