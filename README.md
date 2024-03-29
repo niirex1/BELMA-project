@@ -14,7 +14,7 @@ BELMA employs formal verification techniques such as model checking and symbolic
 
 ### Large Language Models
 
-The BELMA approach employs GPT-3, enhanced with adversarial training for bias and error reduction, to automatically generate precise repair strategies for vulnerabilities in smart contracts across various blockchain platforms.
+The BELMA approach employs GPT-3, enhanced with adversarial training for bias and error reduction, to automatically generate precise repair strategies for vulnerabilities in smart contracts across multiple blockchain platforms.
 
 ## Evaluation
 
