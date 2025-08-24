@@ -44,6 +44,53 @@ To support reproducibility:
 
 ---
 
+## 🔍 Reproducibility Checklist
+
+This section follows best practices (inspired by NeurIPS and ACM reproducibility guidelines) to help reviewers and researchers independently replicate BELMA’s results.
+
+### 1. Dataset
+
+* [x] Training datasets are described in the paper (synthetic + real-world contracts).
+* [x] Scripts to preprocess contracts into BELMA’s pipeline format are included (`/datasets`).
+* [x] Dataset splits (train/val/test) are fixed and reproducible.
+* [x] Curated vulnerability-fix pairs are documented with contract types.
+
+### 2. Code
+
+* [x] Core source code for detection + repair pipeline is provided.
+* [x] Ablation study configurations (symbolic-only, static-only, LLM-only) are included.
+* [x] Example notebook (`example_usage.ipynb`) demonstrates end-to-end pipeline on demo contracts.
+
+### 3. Models
+
+* [x] BELMA’s repair module is fine-tuned on **GPT-3.5-turbo** with hyperparameters specified in the paper.
+* [x] Pre-trained checkpoints are versioned and stored for rollback.
+* [x] Scripts for inference and validation are provided.
+* [ ] Future extension to GPT-4/newer LLMs can reuse the same training pipeline.
+
+### 4. Training Details
+
+* [x] Hyperparameters (learning rate = 2e-5, batch size = 16, max epochs = 10, Adam optimizer, gradient clipping = 1.0) are documented.
+* [x] Early stopping criteria and convergence details are included.
+* [x] Random seeds are fixed (`torch.manual_seed(42)` etc.) for reproducibility.
+* [x] GPU/compute environment specified: **NVIDIA A100, 40GB VRAM, CUDA 11.8, Ubuntu 20.04**.
+
+### 5. Evaluation
+
+* [x] Metrics used: VDR, RSR, Coverage, Time, Precision, Recall, F1, MCC (defined in the paper).
+* [x] Cross-platform results included for Ethereum, Hyperledger Fabric, EOS.
+* [x] Ablation results isolate each module’s contribution.
+* [x] Boxplots include confidence intervals + statistical significance tests (paired t-test, Wilcoxon).
+
+### 6. Limitations & Risks
+
+* [x] BELMA provides **bounded guarantees** via symbolic re-verification but not full correctness.
+* [x] Zero-day vulnerabilities not in training data may evade detection; future directions include anomaly detection & unsupervised learning.
+* [x] Risk of incorrect patch deployment in production noted; human-in-the-loop validation is recommended.
+* [x] Dataset bias mitigated by balanced sampling, adversarial fine-tuning, and human curation.
+
+---
+
 ## Getting Started
 
 ### Prerequisites
