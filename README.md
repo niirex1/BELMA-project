@@ -1,24 +1,46 @@
-# BELMA: An Optimized Dual-Layer Approach for Smart Contract Vulnerability Repair via Formal Verification and Machine Learning
+# BELMA: Dual-Layer Framework for Smart Contract Vulnerability Detection and Repair
 
 ## Introduction
 
-The security of smart contracts is a paramount concern in the blockchain ecosystem. Traditional methods often rely on either formal verification or machine learning techniques, each with its own set of limitations. 
+Smart contract security is a critical challenge in blockchain ecosystems. Existing approaches rely either on **formal verification** or **machine learning**, often with trade-offs in accuracy, scalability, or repair reliability.
+
+**BELMA** introduces a **dual-layer architecture** that integrates symbolic/formal verification with **large language model (LLM)-driven repair** to provide reproducible, efficient, and scalable vulnerability detection and automated patching.
+
+---
 
 ## About BELMA
 
-We introduce **BELMA**, a comprehensive framework that synergistically combines formal verification methods and large language models like GPT-3 for smart contract vulnerability detection and repair. 
+### Formal Verification Layer
 
-### Formal Verification Methods
+* Performs **symbolic execution** and **model checking**.
+* Ensures detection coverage for reentrancy, integer overflow/underflow, unchecked call return, and access control flaws.
 
-BELMA employs formal verification techniques such as model checking and symbolic execution to rigorously identify a wide range of vulnerabilities, including reentrancy, integer overflow, and unauthorized access.
+### LLM-Based Repair Layer
 
-### Large Language Models
+* Uses **GPT-3.5-turbo** (fine-tuned on curated vulnerability–fix pairs) for patch generation.
+* Employs iterative validation:
 
-The BELMA approach employs GPT-3, enhanced with adversarial training for bias and error reduction, to automatically generate precise repair strategies for vulnerabilities in smart contracts across multiple blockchain platforms.
+  * Candidate patch generation
+  * Re-verification with symbolic checks
+  * Rollback if violations remain
+* Training settings: max 10 epochs, learning rate `2e-5`, batch size 16, Adam optimizer with gradient clipping (1.0). Early stopping at \~5 epochs to prevent overfitting.
+* Datasets include both **synthetic contracts** and **real-world vulnerabilities**, balanced to mitigate bias.
 
-## Evaluation
+---
 
-BELMA has been rigorously evaluated across multiple blockchain platforms including Ethereum, Hyperledger Fabric, and EOS. It outperforms baseline methods in key metrics such as accuracy, network load, data privacy, and cost-benefit trade-offs.
+## Evaluation & Reproducibility
+
+BELMA has been tested on **Ethereum, Hyperledger Fabric, and EOS**. Evaluation included:
+
+* Cross-platform experiments (RQ1–RQ4 in the paper)
+* Ablation studies isolating symbolic execution, static analysis, and LLM-only repair
+* Statistical significance checks (paired t-test, Wilcoxon)
+
+To support reproducibility:
+
+* **Dockerfile** and `requirements.txt` are provided.
+* Random seeds are fixed for training and inference (`torch.manual_seed(42)` etc.).
+* Example notebooks reproduce vulnerability detection and repair on demo contracts.
 
 ---
 
@@ -26,64 +48,72 @@ BELMA has been rigorously evaluated across multiple blockchain platforms includi
 
 ### Prerequisites
 
-Before you begin, ensure you have the following installed:
-
-- Python (version 3.7 or higher)
-- Git (for cloning the repository)
+* Python >= 3.8
+* CUDA-enabled GPU (tested on NVIDIA A100, 40GB VRAM)
+* Linux (Ubuntu 20.04/22.04 recommended)
+* OpenAI API key (for GPT-3.5-turbo inference/fine-tuning)
 
 ### Installation
 
-1. **Clone the Repository**
+```bash
+git clone https://github.com/YourUsername/BELMA-project.git
+cd BELMA-project
+pip install -r requirements.txt
+```
 
-   ```bash
-   git clone https://github.com/YourUsername/BELMA-project.git
-   ```
+Optional:
 
-2. **Navigate to the Project Directory**
-
-   ```bash
-   cd BELMA-project
-   ```
-
-3. **Install Required Python Packages**
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Install Required Python Packages**
-
-   ```bash
-   pip install openai
-   ```
+```bash
+pip install openai
+```
 
 ### Running BELMA
 
-Please refer to the `example_usage.ipynb` notebook for a detailed guide on how to use the framework for smart contract vulnerability detection and repair.
+See `example_usage.ipynb` for:
+
+* loading sample contracts
+* running detection + automated repair
+* validating patches with symbolic checks
+
+---
+
+## Dataset Preparation
+
+1. **Synthetic Vulnerabilities** (generated using templates for RA, IOU, TXO, etc.)
+2. **Curated Real-World Contracts** (Ethereum + Hyperledger Fabric)
+3. **Training Data for LLM Fine-Tuning**
+
+   * Balanced sampling of \~3,500 contracts
+   * Annotated with fixes for reentrancy, integer overflows, unchecked call returns
+   * Human-curated validation set
+
+Scripts are provided in `/datasets` to preprocess contracts into BELMA’s pipeline format.
 
 ---
 
 ## Contributing
 
-We welcome contributions from the research community. For guidelines on contributing, please refer to the [Contributing](CONTRIBUTING.md) documentation.
+We welcome contributions from the community:
+
+* Extend BELMA to other platforms (e.g., Solana, Avalanche)
+* Improve dataset diversity (zero-day coverage, adversarial contracts)
+* Enhance repair validation pipelines
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ---
 
 ## License
 
-### MIT License
-
-BELMA is licensed under the MIT License. For the full license text, refer to the `LICENSE` file in the repository or visit [MIT License](LICENSE.md).
+BELMA is released under the **MIT License**.
+See [LICENSE](LICENSE.md) for full terms.
 
 ---
 
 ## Contact & Support
 
-For any questions, feedback, or suggestions regarding the BELMA project, please reach out to the project maintainers:
+* **Rexford Sosu**
 
-- **Rexford Sosu**
-  - Email: rexfordsosu@outlook.com
-  - GitHub: [@rexfordsosu](https://github.com/niirex1)
-  - LinkedIn: [Rexford's LinkedIn](https://www.linkedin.com/in/rexford-sosu-b4593b57/)
-
-We appreciate your interest in the BELMA project and look forward to your contributions!
+  * 📧 [rexfordsosu@outlook.com](mailto:rexfordsosu@outlook.com)
+  * GitHub: [@niirex1](https://github.com/niirex1)
+  * LinkedIn: [Rexford Sosu](https://www.linkedin.com/in/rexford-sosu-b4593b57/)
