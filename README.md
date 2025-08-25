@@ -58,66 +58,28 @@ Reproducibility support includes:
 
 ---
 
-## Dataset Preparation
+## 🔑 Demo Quickstart (Runs in <1 Minute)
 
-1. **Synthetic Vulnerabilities**  
-   Generated using templates for reentrancy, integer overflow, tx-origin misuse, unchecked calls, etc.  
+To verify reproducibility, BELMA ships with **four small sample contracts** illustrating common vulnerabilities (Reentrancy, Unchecked Call, Integer Overflow, Access Control).  
+The demo runs the full pipeline — **detection → repair → symbolic re-verification** — entirely offline by default (no API key required).
 
-2. **Curated Real-World Contracts**  
-   Sources: Etherscan (Ethereum), Fabric repos, EOS dApps.  
-   Inclusion criteria: verified source code, sufficient complexity, documented vulnerabilities.  
-
-3. **LLM Fine-Tuning Data**  
-   * ~3,500 contracts with paired fixes  
-   * Balanced across vulnerability types  
-   * Human-curated validation subset  
-
-Scripts are provided in `/datasets` to preprocess contracts into BELMA’s pipeline format.
-
----
-
-## Limitations & Risks
-
-* **Bounded guarantees only**: symbolic re-verification ensures bounded correctness, but full functional correctness cannot be guaranteed.  
-* **Zero-day vulnerabilities**: unseen bugs may escape detection. Future directions: anomaly detection & unsupervised ML.  
-* **Obfuscated/adversarial contracts**: may evade detection/repair; adversarial training and hybrid verification are proposed mitigations.  
-* **Dataset bias**: mitigated through balanced sampling, adversarial fine-tuning, and human curation, but remains a concern.  
-* **Deployment risks**: incorrect patches may cause regressions in production. Human-in-the-loop validation is recommended before deployment.  
-
----
-
-## Getting Started
-
-### Prerequisites
-* Python >= 3.8  
-* CUDA-enabled GPU (tested on NVIDIA A100, 40GB VRAM)  
-* Linux (Ubuntu 20.04/22.04 recommended)  
-* OpenAI API key (for GPT-3.5-turbo inference/fine-tuning)  
-
-### Installation
 ```bash
+# 1. Clone and install
 git clone https://github.com/niirex1/BELMA-project.git
 cd BELMA-project
 pip install -r requirements.txt
 
+# 2. Run the demo (offline mode, finishes in <1 min)
+python run_belma_demo.py
 
-Optional:
-
-```bash
-pip install openai
-```
-
-### Running BELMA
-
-* See `example_usage.ipynb` for:
-
-   * loading sample contracts
-   * running detection + automated repair
-   * validating patches with symbolic checks
+# 3. Inspect results
+# - Original & patched contracts: outputs/demo/*.sol
+# - JSON reports: outputs/demo/*.report.json
+# - Aggregate summary: outputs/demo/aggregate_report.json
 
 ---
-
-export BELMA_OFFLINE_MODE=1
+export BELMA_OFFLINE_MODE=0
+export OPENAI_API_KEY=sk-...   # your key here
 python run_belma_demo.py
 
 ---
