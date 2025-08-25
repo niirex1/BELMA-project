@@ -1,0 +1,27 @@
+# Core
+python-dotenv==1.0.1
+tqdm==4.66.4
+numpy==1.26.4
+pandas==2.2.2
+matplotlib==3.8.4
+scikit-learn==1.4.2
+PyYAML==6.0.1
+networkx==3.3
+
+# Blockchain / parsing
+web3==6.19.0
+eth-utils==4.1.1
+solcx==0.15.1
+
+# Formal/symbolic & static (lightweight stubs; heavy tools remain optional)
+mythril==0.24.6         # optional, used in mock/static demo
+slither-analyzer==0.10.3 # optional; requires solc in PATH
+
+# LLM / repair (API + local glue)
+openai==1.35.10
+transformers==4.41.2
+torch==2.3.1
+
+# Plotting for paper figs
+seaborn==0.13.2
+scipy==1.13.1
