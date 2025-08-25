@@ -1,0 +1,26 @@
+name: belma
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip=24.0
+  - numpy=1.26.4
+  - pandas=2.2.2
+  - matplotlib=3.8.4
+  - scikit-learn=1.4.2
+  - pyyaml=6.0.1
+  - networkx=3.3
+  - scipy=1.13.1
+  - pip:
+      - python-dotenv==1.0.1
+      - tqdm==4.66.4
+      - web3==6.19.0
+      - eth-utils==4.1.1
+      - solcx==0.15.1
+      - mythril==0.24.6
+      - slither-analyzer==0.10.3
+      - openai==1.35.10
+      - transformers==4.41.2
+      - torch==2.3.1
+      - seaborn==0.13.2
