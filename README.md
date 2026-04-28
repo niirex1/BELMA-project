@@ -1,112 +1,113 @@
-# BELMA: Dual-Layer Framework for Smart Contract Vulnerability Detection and Repair
+# BELMA — Blockchain-Enhanced Language Model Approach
 
-## Introduction
+Reference implementation accompanying the paper:
 
-Smart contract security is a critical challenge in blockchain ecosystems. Existing approaches rely either on **formal verification** or **machine learning**, often with trade-offs in accuracy, scalability, or repair reliability.
+> **BELMA: Integrating Formal Verification and Large Language Models for Enhanced
+> Smart Contract Security**
+> Sosu, Chen, Boahen, Cai, Wang, Babu — IEEE TDSC, 2025.
 
-**BELMA** introduces a **dual-layer architecture** that integrates symbolic/formal verification with **large language model (LLM)-driven repair** to provide reproducible, efficient, and scalable vulnerability detection and automated patching.  
+BELMA is a dual-layer framework for smart contract vulnerability detection and
+automated repair. The first layer applies bounded symbolic verification; the
+second employs a fine-tuned LLM to generate candidate patches that are
+re-validated against SWC-derived assertions inside a closed refinement loop.
 
-This repository includes **code, datasets, configurations, and notebooks** to reproduce the main experiments reported in the manuscript.
+```
+                    ┌─────────────────────────────┐
+                    │     Smart Contract (S)      │
+                    └──────────────┬──────────────┘
+                                   │
+                  ┌────────────────▼─────────────────┐
+                  │   Layer 1: Vulnerability         │
+                  │   Detection                      │
+                  │   (Word2Vec + Symbolic + Rules)  │
+                  └────────────────┬─────────────────┘
+                       Structured Context (AST + meta)
+                                   │
+                  ┌────────────────▼─────────────────┐
+                  │   Layer 2: Automated Repair      │
+                  │   (LLM patch + Bias/Error guide) │
+                  │   ┌─── refine while B>τ_B ──┐    │
+                  │   │   or E>τ_E (k_max=5)    │    │
+                  │   └─────────────────────────┘    │
+                  └────────────────┬─────────────────┘
+                       Bounded re-verification (k=16)
+                                   │
+                  ┌────────────────▼─────────────────┐
+                  │   Cost–Benefit (Pareto) +        │
+                  │   DHT Load Balancing             │
+                  └────────────────┬─────────────────┘
+                                   │
+                          Patched Contract (S')
+```
 
----
+## Repository layout
 
-## About BELMA
+| Path                     | Contents                                                            |
+|--------------------------|---------------------------------------------------------------------|
+| `belma/detection/`       | Symbolic execution, static rules, Word2Vec, IR translator           |
+| `belma/repair/`          | LLM patcher, BiasScore, ErrorScore, refinement loop, validator      |
+| `belma/beyond_swc/`      | Anomaly screen + LLM-guided hypothesis pipeline (advisory only)     |
+| `belma/optimization/`    | Pareto-based cost–benefit optimizer                                 |
+| `belma/infrastructure/`  | DHT load balancer, cache, batch processor                           |
+| `belma/platforms/`       | Per-platform adapters (Ethereum / Fabric / EOS)                     |
+| `belma/metrics/`         | Capability vs. infrastructure metric separation                     |
+| `experiments/`           | Scripts to reproduce RQ1–RQ4 + every revision-round experiment      |
+| `configs/belma_config.yaml` | All loop / threshold / k-bound constants (R1-C4 reproducibility)|
+| `docs/`                  | Architecture, revision response, worked example                     |
 
-### Formal Verification Layer
-* Performs **symbolic execution** and **model checking**.  
-* Ensures detection coverage for reentrancy, integer overflow/underflow, unchecked call returns, access control flaws, and transaction-order dependence.  
-
-### LLM-Based Repair Layer
-* Uses **GPT-3.5-turbo** (fine-tuned on curated vulnerability–fix pairs) for patch generation.  
-* Employs iterative validation:  
-  - Candidate patch generation  
-  - Re-verification with symbolic checks  
-  - Rollback if violations remain  
-* Training settings: max 10 epochs, learning rate `2e-5`, batch size 16, AdamW optimizer with gradient clipping (1.0). Early stopping at ~5 epochs to prevent overfitting.  
-* Datasets include both **synthetic contracts** and **real-world vulnerabilities**, balanced to mitigate bias.  
-
-> **Note:** GPT-3.5 is used in this work. For forward-compatibility, the training pipeline supports GPT-4 or future LLMs with minimal adjustment.
-
----
-
-## Evaluation & Reproducibility
-
-BELMA has been evaluated on **Ethereum, Hyperledger Fabric, and EOS**. Evaluation included:  
-* Cross-platform experiments (RQ1–RQ4 in the paper)  
-* Ablation studies isolating symbolic execution, static analysis, and LLM-only repair  
-* Statistical significance checks (paired t-test, Wilcoxon)  
-
-Reproducibility support includes:  
-* `requirements.txt` and `environment.yml` with pinned versions  
-* Example notebook (`example_usage.ipynb`) showing detection → repair → validation on toy contracts  
-* Fixed random seeds (`torch.manual_seed(42)`, NumPy, Python)  
-* Config files under `/experiments/configs/` for controlled ablation runs  
-* A symbolic **`validate_patch.py`** script to re-verify generated patches  
-
----
-
-## Reproducibility Checklist
-
-- [x] **Environment files**: `requirements.txt` and `environment.yml` provided  
-- [x] **Deterministic seeds**: all training and inference runs use fixed random seeds  
-- [x] **Toy dataset + demo run**: included in `/datasets/demo` for <1 min end-to-end test  
-- [x] **Full datasets**: synthetic + curated real-world (Ethereum, Fabric, EOS) with preprocessing scripts  
-- [x] **Configs**: ablation and experiment configs under `/experiments/configs/*.yaml`  
-- [x] **Figures/tables**: reproduction scripts for selected tables and plots (`/experiments/reproduce_figures.ipynb`)  
-- [x] **LLM usage**: `.env.example` for API keys, plus cached outputs (offline mode)  
-- [x] **Repair validation**: `validate_patch.py` ensures symbolic re-verification before deployment  
-
----
-
-## 🔑 Demo Quickstart (Runs in <1 Minute)
-
-To verify reproducibility, BELMA ships with **four small sample contracts** illustrating common vulnerabilities (Reentrancy, Unchecked Call, Integer Overflow, Access Control).  
-The demo runs the full pipeline — **detection → repair → symbolic re-verification** — entirely offline by default (no API key required).
+## Quick start
 
 ```bash
-# 1. Clone and install
 git clone https://github.com/niirex1/BELMA-project.git
 cd BELMA-project
-pip install -r requirements.txt
+pip install -e .
+python -m belma.pipeline --contract examples/Reentrant.sol --platform ethereum
+```
 
-# 2. Run the demo (offline mode, finishes in <1 min)
-python run_belma_demo.py
+## Reproducing the paper
 
-# 3. Inspect results
-# - Original & patched contracts: outputs/demo/*.sol
-# - JSON reports: outputs/demo/*.report.json
-# - Aggregate summary: outputs/demo/aggregate_report.json
+```bash
+bash scripts/reproduce_paper_results.sh           # RQ1–RQ4 baseline numbers
+python experiments/k_bound_sensitivity.py         # §VI.H, addresses R2-W1
+python experiments/bias_error_sensitivity.py      # Table N, addresses R1-C4
+python experiments/complexity_stratification.py   # Table Q, addresses R2-W3
+python experiments/beyond_swc_evaluation.py       # §VI.G, addresses R2-W2
+python experiments/single_node_ablation.py        # §V.E, addresses R1-C2
+python experiments/echidna_comparison.py          # §VII.A, addresses R2-Other-1
+```
 
----
-export BELMA_OFFLINE_MODE=0
-export OPENAI_API_KEY=sk-...   # your key here
-python run_belma_demo.py
+## Revision-round changes (manuscript revision Sept 2025 → resubmission)
 
----
+A complete walk-through is in [`docs/REVISION_RESPONSE.md`](docs/REVISION_RESPONSE.md);
+the short version is below.
 
-## Contributing
+| #  | Reviewer item                                | What changed in this repo                                            |
+|----|----------------------------------------------|----------------------------------------------------------------------|
+| 1  | R1-C4: BiasScore / ErrorScore                | `belma/repair/{bias_score,error_score}.py`, `configs/belma_config.yaml`, `experiments/bias_error_sensitivity.py` |
+| 2  | R2-W2: Beyond-SWC / zero-day                 | `belma/beyond_swc/`, `data/beyond_swc_manifest.json`, `experiments/beyond_swc_evaluation.py` |
+| 3  | R2-W1: k-bound sensitivity                   | `experiments/k_bound_sensitivity.py`, FN attribution in `belma/detection/symbolic_executor.py` |
+| 4  | R2-W3: Complexity × obfuscation degradation  | `experiments/complexity_stratification.py`, `belma/metrics/complexity.py` |
+| 5  | R1-C2: Capability vs. infrastructure split   | `belma/metrics/{capability,infrastructure}.py`, `experiments/single_node_ablation.py` |
+| 6  | R1-C3: Latency decomposition                 | `belma/metrics/latency_decomposition.py`, instrumented in `belma/repair/refinement_loop.py` |
+| 7  | R2-W4: Li et al. 2025 reference              | Added to `docs/REVISION_RESPONSE.md` and bibliography snippet         |
+| 8  | R2-Other-1: Echidna / sFuzz / ConFuzzius     | `experiments/echidna_comparison.py`, property templates in `data/`    |
+| 9  | R2-Other-2: Deployment considerations        | `docs/DEPLOYMENT.md`                                                  |
+| 10 | R2-Other-3: Failure mode taxonomy            | `docs/FAILURE_TAXONOMY.md`, classes in `belma/metrics/failures.py`    |
+| 11 | R1-C1: Worked obfuscation example            | `docs/WORKED_EXAMPLE.md`, regression test in `tests/test_obfuscation.py` |
 
-We welcome contributions from the community:
+## Citation
 
-* Extend BELMA to other platforms (e.g., Solana, Avalanche)
-* Improve dataset diversity (zero-day coverage, adversarial contracts)
-* Enhance repair validation pipelines
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
-
----
+```bibtex
+@article{sosu2025belma,
+  author  = {Sosu, Rexford Nii Ayitey and Chen, Jinfu and Boahen, Edward Kwadwo and
+             Cai, Saihua and Wang, Shengran and Babu, C. Narendra},
+  title   = {{BELMA}: Integrating Formal Verification and Large Language Models
+             for Enhanced Smart Contract Security},
+  journal = {IEEE Transactions on Dependable and Secure Computing},
+  year    = {2025}
+}
+```
 
 ## License
 
-BELMA is released under the **MIT License**.
-See [LICENSE](LICENSE.md) for full terms.
-
----
-
-## Contact & Support
-
-* **Rexford Sosu**
-
-  * 📧 [rexfordsosu@outlook.com](mailto:rexfordsosu@outlook.com)
-  * GitHub: [@niirex1](https://github.com/niirex1)
-  * LinkedIn: [Rexford Sosu](https://www.linkedin.com/in/rexford-sosu-b4593b57/)
+Apache 2.0. See `LICENSE`.
