@@ -1,0 +1,41 @@
+# BELMA Configuration File
+# Path: /config/belma_config.yaml
+# Version: 1.0.0
+# Last Updated: 2025-04-28
+
+bias_score:
+  # Weighted sum components from Eq. (1) in manuscript
+  weights:
+    w1: 0.5   # Cosine distance to secure patch centroid
+    w2: 0.3   # Length-normalized perplexity under GPT-3.5-turbo
+    w3: 0.2   # Inverse AST similarity to nearest template
+  threshold: 0.15  # τ_B: maximum acceptable bias score
+
+error_score:
+  # Weighted sum components from Eq. (1) in manuscript
+  weights:
+    alpha1: 0.5   # Compilation failure flag (binary)
+    alpha2: 0.4   # Assertion violation fraction under k-bounded verification
+    alpha3: 0.1   # Regression test failure fraction (0 if no tests)
+  threshold: 0.05  # τ_E: maximum acceptable error score
+
+loop:
+  k_max: 5  # Maximum refinement iterations before human review
+
+# Validation parameters (from §V.C)
+validation:
+  k_bounded_depth: 10  # Execution depth for symbolic re-verification
+  bootstrap_resamples: 1000  # For 95% CI computation
+  test_set_split: 0.15  # Proportion of synthetic data held out
+
+# Component weights from Eq. (3) cost function
+cost_optimization:
+  alpha: 0.5  # FP weight (w₁ in Eq. 3)
+  beta: 0.3   # FN weight (w₂ in Eq. 3)
+  gamma: 0.2  # Computational cost weight (w₃ in Eq. 3)
+
+# Model endpoints (from §V.C)
+models:
+  embedding: "bert-base-uncased"
+  llm: "gpt-3.5-turbo"
+  temperature: 0.0  # For deterministic patch generation
