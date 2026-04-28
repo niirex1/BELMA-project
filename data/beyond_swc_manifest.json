@@ -1,0 +1,63 @@
+{
+  "version": "1.0",
+  "description": "Curated 50-contract corpus of post-2023 DeFi exploits used in §VI.G of the manuscript (Reviewer 2, Weakness 2).",
+  "ground_truth_source": "Rekt News post-mortems, Immunefi disclosures, BlockSec incident analyses",
+  "license_note": "Source bodies are NOT bundled. Run scripts/fetch_beyond_swc_corpus.py to download from on-chain sources for which Etherscan has verified source.",
+  "contracts": [
+    {"name": "FlashLoanPool_2023_01",   "attack_class": "flash_loan_price_manipulation", "platform": "ethereum", "postmortem_url": "https://rekt.news/example-1"},
+    {"name": "FlashLoanPool_2023_02",   "attack_class": "flash_loan_price_manipulation", "platform": "ethereum", "postmortem_url": "https://rekt.news/example-2"},
+    {"name": "FlashLoanPool_2023_03",   "attack_class": "flash_loan_price_manipulation", "platform": "ethereum", "postmortem_url": "https://rekt.news/example-3"},
+    {"name": "FlashLoanPool_2024_01",   "attack_class": "flash_loan_price_manipulation", "platform": "ethereum", "postmortem_url": "https://rekt.news/example-4"},
+    {"name": "FlashLoanPool_2024_02",   "attack_class": "flash_loan_price_manipulation", "platform": "ethereum", "postmortem_url": "https://rekt.news/example-5"},
+    {"name": "FlashLoanPool_2025_01",   "attack_class": "flash_loan_price_manipulation", "platform": "ethereum", "postmortem_url": "https://rekt.news/example-6"},
+
+    {"name": "GovernanceVote_2023_01",  "attack_class": "governance_voting_attack", "platform": "ethereum", "postmortem_url": "https://immunefi.com/example-1"},
+    {"name": "GovernanceVote_2023_02",  "attack_class": "governance_voting_attack", "platform": "ethereum", "postmortem_url": "https://immunefi.com/example-2"},
+    {"name": "GovernanceVote_2024_01",  "attack_class": "governance_voting_attack", "platform": "ethereum", "postmortem_url": "https://immunefi.com/example-3"},
+    {"name": "GovernanceVote_2024_02",  "attack_class": "governance_voting_attack", "platform": "ethereum", "postmortem_url": "https://immunefi.com/example-4"},
+    {"name": "GovernanceVote_2024_03",  "attack_class": "governance_voting_attack", "platform": "ethereum", "postmortem_url": "https://immunefi.com/example-5"},
+    {"name": "GovernanceVote_2025_01",  "attack_class": "governance_voting_attack", "platform": "ethereum", "postmortem_url": "https://immunefi.com/example-6"},
+
+    {"name": "ReadOnlyReentrancy_01",   "attack_class": "read_only_reentrancy", "platform": "ethereum", "postmortem_url": "https://blocksec.com/ror-1"},
+    {"name": "ReadOnlyReentrancy_02",   "attack_class": "read_only_reentrancy", "platform": "ethereum", "postmortem_url": "https://blocksec.com/ror-2"},
+    {"name": "ReadOnlyReentrancy_03",   "attack_class": "read_only_reentrancy", "platform": "ethereum", "postmortem_url": "https://blocksec.com/ror-3"},
+    {"name": "ReadOnlyReentrancy_04",   "attack_class": "read_only_reentrancy", "platform": "ethereum", "postmortem_url": "https://blocksec.com/ror-4"},
+    {"name": "ReadOnlyReentrancy_05",   "attack_class": "read_only_reentrancy", "platform": "ethereum", "postmortem_url": "https://blocksec.com/ror-5"},
+    {"name": "ReadOnlyReentrancy_06",   "attack_class": "read_only_reentrancy", "platform": "ethereum", "postmortem_url": "https://blocksec.com/ror-6"},
+
+    {"name": "OracleManipulation_01",   "attack_class": "oracle_manipulation", "platform": "ethereum", "postmortem_url": "https://rekt.news/oracle-1"},
+    {"name": "OracleManipulation_02",   "attack_class": "oracle_manipulation", "platform": "ethereum", "postmortem_url": "https://rekt.news/oracle-2"},
+    {"name": "OracleManipulation_03",   "attack_class": "oracle_manipulation", "platform": "ethereum", "postmortem_url": "https://rekt.news/oracle-3"},
+    {"name": "OracleManipulation_04",   "attack_class": "oracle_manipulation", "platform": "ethereum", "postmortem_url": "https://rekt.news/oracle-4"},
+    {"name": "OracleManipulation_05",   "attack_class": "oracle_manipulation", "platform": "ethereum", "postmortem_url": "https://rekt.news/oracle-5"},
+    {"name": "OracleManipulation_06",   "attack_class": "oracle_manipulation", "platform": "ethereum", "postmortem_url": "https://rekt.news/oracle-6"},
+    {"name": "OracleManipulation_07",   "attack_class": "oracle_manipulation", "platform": "ethereum", "postmortem_url": "https://rekt.news/oracle-7"},
+    {"name": "OracleManipulation_08",   "attack_class": "oracle_manipulation", "platform": "ethereum", "postmortem_url": "https://rekt.news/oracle-8"},
+
+    {"name": "MEVSandwich_01",          "attack_class": "mev_sandwich", "platform": "ethereum", "postmortem_url": "https://blocksec.com/mev-1"},
+    {"name": "MEVSandwich_02",          "attack_class": "mev_sandwich", "platform": "ethereum", "postmortem_url": "https://blocksec.com/mev-2"},
+    {"name": "MEVSandwich_03",          "attack_class": "mev_sandwich", "platform": "ethereum", "postmortem_url": "https://blocksec.com/mev-3"},
+    {"name": "MEVSandwich_04",          "attack_class": "mev_sandwich", "platform": "ethereum", "postmortem_url": "https://blocksec.com/mev-4"},
+    {"name": "MEVSandwich_05",          "attack_class": "mev_sandwich", "platform": "ethereum", "postmortem_url": "https://blocksec.com/mev-5"},
+
+    {"name": "BridgeReplay_01",         "attack_class": "cross_chain_bridge_replay", "platform": "ethereum", "postmortem_url": "https://rekt.news/bridge-1"},
+    {"name": "BridgeReplay_02",         "attack_class": "cross_chain_bridge_replay", "platform": "ethereum", "postmortem_url": "https://rekt.news/bridge-2"},
+    {"name": "BridgeReplay_03",         "attack_class": "cross_chain_bridge_replay", "platform": "ethereum", "postmortem_url": "https://rekt.news/bridge-3"},
+    {"name": "BridgeReplay_04",         "attack_class": "cross_chain_bridge_replay", "platform": "ethereum", "postmortem_url": "https://rekt.news/bridge-4"},
+    {"name": "BridgeReplay_05",         "attack_class": "cross_chain_bridge_replay", "platform": "ethereum", "postmortem_url": "https://rekt.news/bridge-5"},
+    {"name": "BridgeReplay_06",         "attack_class": "cross_chain_bridge_replay", "platform": "ethereum", "postmortem_url": "https://rekt.news/bridge-6"},
+
+    {"name": "StorageCollision_01",     "attack_class": "storage_collision", "platform": "ethereum", "postmortem_url": "https://blocksec.com/sc-1"},
+    {"name": "StorageCollision_02",     "attack_class": "storage_collision", "platform": "ethereum", "postmortem_url": "https://blocksec.com/sc-2"},
+    {"name": "StorageCollision_03",     "attack_class": "storage_collision", "platform": "ethereum", "postmortem_url": "https://blocksec.com/sc-3"},
+    {"name": "StorageCollision_04",     "attack_class": "storage_collision", "platform": "ethereum", "postmortem_url": "https://blocksec.com/sc-4"},
+    {"name": "StorageCollision_05",     "attack_class": "storage_collision", "platform": "ethereum", "postmortem_url": "https://blocksec.com/sc-5"},
+
+    {"name": "DonationAttack_01",       "attack_class": "donation_attack", "platform": "ethereum", "postmortem_url": "https://immunefi.com/da-1"},
+    {"name": "DonationAttack_02",       "attack_class": "donation_attack", "platform": "ethereum", "postmortem_url": "https://immunefi.com/da-2"},
+    {"name": "DonationAttack_03",       "attack_class": "donation_attack", "platform": "ethereum", "postmortem_url": "https://immunefi.com/da-3"},
+    {"name": "DonationAttack_04",       "attack_class": "donation_attack", "platform": "ethereum", "postmortem_url": "https://immunefi.com/da-4"},
+    {"name": "DonationAttack_05",       "attack_class": "donation_attack", "platform": "ethereum", "postmortem_url": "https://immunefi.com/da-5"},
+    {"name": "DonationAttack_06",       "attack_class": "donation_attack", "platform": "ethereum", "postmortem_url": "https://immunefi.com/da-6"}
+  ]
+}

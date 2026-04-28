@@ -1,0 +1,93 @@
+# BELMA configuration
+# All constants exposed here per Reviewer 1, Comment 4 (operational reproducibility).
+# Updating any value below requires re-running experiments/bias_error_sensitivity.py
+# and experiments/k_bound_sensitivity.py and updating Tables N and P.
+
+bias_score:
+  # B(T') = w1 * d_cos(phi(T'), mu_secure) + w2 * PPL_hat(T') + w3 * (1 - sim_AST)
+  weights:
+    w1: 0.5    # cosine distance from secure-patch centroid in BERT space
+    w2: 0.3    # length-normalized perplexity under reference LM
+    w3: 0.2    # 1 - normalized AST tree-edit similarity to nearest SWC template
+  threshold: 0.15            # tau_B; patch acceptance when B <= tau_B AND E <= tau_E
+
+error_score:
+  # E(T') = a1 * e_compile + a2 * e_assert + a3 * e_regress
+  weights:
+    alpha1: 0.5  # compile failure flag {0,1} from solc / protoc / eosio-cpp
+    alpha2: 0.4  # fraction of SWC-derived bounded assertions still violated
+    alpha3: 0.1  # fraction of pre-existing functional unit tests failing
+  threshold: 0.05            # tau_E
+
+refinement_loop:
+  k_max: 5                   # maximum refinement iterations (Algorithm 2)
+  on_non_convergence: human_review   # never auto-accept; flag for human review
+  log_per_iteration: true            # required for latency decomposition (R1-C3)
+
+symbolic_execution:
+  # k-bound chosen by sweep in experiments/k_bound_sensitivity.py (R2-W1).
+  # +2.1 pp VDR from k=8 to k=16, +0.4 pp from k=16 to k=32, runtime ~2x per doubling.
+  k_default: 16
+  smt_timeout_seconds: 30
+  loop_unroll_bound: 8
+  inter_contract_call_depth: 4
+
+beyond_swc:
+  # Advisory pipeline for non-SWC vulnerabilities (R2-W2). Never auto-patches.
+  enabled: true
+  mahalanobis_percentile: 95         # delta = 95th percentile of in-distribution distances
+  fewshot_examples: 8                # eight curated post-2023 exploit examples
+  attack_classes:
+    - flash_loan_price_manipulation
+    - governance_voting_attack
+    - read_only_reentrancy
+    - oracle_manipulation
+    - mev_sandwich
+    - cross_chain_bridge_replay
+    - storage_collision
+    - donation_attack
+
+cost_benefit:
+  # Pareto-based optimization (Algorithm 4). Weights tunable per deployment context.
+  alpha: 1.0    # false-positive weight
+  beta: 1.0     # false-negative weight (raise for high-stakes financial contracts)
+  gamma: 0.5    # runtime weight (raise for audit-scale workloads)
+  pareto_filter: non_dominated
+
+infrastructure:
+  # All values below are "engineering-layer" knobs; per R1-C2 they affect
+  # infrastructure metrics (TP, L) but not capability metrics (VDR, RSR).
+  dht:
+    enabled: true
+    replicas: 3
+    hash_function: sha256
+  cache:
+    enabled: true
+    max_entries: 50000
+    ttl_seconds: 86400
+  batch:
+    enabled: true
+    max_batch_size: 32
+
+llm:
+  model: gpt-3.5-turbo
+  temperature: 0.0           # 0 for reproducibility; logprobs feed PPL_hat
+  max_tokens: 1024
+  embedding_model: bert-base-uncased
+
+platforms:
+  ethereum:
+    compiler: solc
+    gas_constraint: true
+  fabric:
+    compiler: protoc
+    endorsement_policy_check: true
+  eos:
+    compiler: eosio-cpp
+    cpu_net_ram_check: true
+
+evaluation:
+  random_seed: 20250901
+  ci_method: bootstrap_percentile
+  bootstrap_samples: 10000
+  significance_alpha: 0.05

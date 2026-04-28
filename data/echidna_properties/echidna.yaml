@@ -1,0 +1,22 @@
+# Echidna configuration used in experiments/echidna_comparison.py.
+# Matches the conditions described in §VII.A (R2-Other-1).
+testLimit: 50000
+seqLen: 100
+testMode: assertion
+shrinkLimit: 5000
+allContracts: true
+prefix: echidna_
+seed: 20250901
+psender: "0x10000"
+contractAddr: "0x20000"
+deployer: "0x30000"
+maxValue: 100000000000000000000
+balanceContract: 0
+balanceAddr: 0xffffffffffffffffffffffff
+maxGasprice: 0
+estimateGas: false
+filterFunctions: []
+filterBlacklist: true
+coverage: true
+format: text
+quiet: false
