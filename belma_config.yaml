@@ -1,41 +1,149 @@
-# BELMA Configuration File
-# Path: /config/belma_config.yaml
-# Version: 1.0.0
-# Last Updated: 2025-04-28
+# BELMA configuration
+# All constants exposed here per Reviewer 1, Comment 4 (operational reproducibility)
+# and, from revision round 3, per the Associate Editor / Reviewer 2 comment on the
+# LLM training and fine-tuning setup (exact model, hosted vs. local procedure,
+# hyperparameters, prompts, seeds). Two trained components exist and are configured
+# separately below: the hosted GPT-3.5 patch generator (fine_tuning) and the locally
+# trained BERT embedding model (embedding_training). The AdamW/A100 settings apply
+# to the embedding model only.
+# Updating any value below requires re-running experiments/bias_error_sensitivity.py
+# and experiments/k_bound_sensitivity.py and updating Tables N and P.
 
 bias_score:
-  # Weighted sum components from Eq. (1) in manuscript
+  # B(T') = w1 * d_cos(phi(T'), mu_secure) + w2 * PPL_hat(T') + w3 * (1 - sim_AST)
   weights:
-    w1: 0.5   # Cosine distance to secure patch centroid
-    w2: 0.3   # Length-normalized perplexity under GPT-3.5-turbo
-    w3: 0.2   # Inverse AST similarity to nearest template
-  threshold: 0.15  # τ_B: maximum acceptable bias score
+    w1: 0.5    # cosine distance from secure-patch centroid in BERT space
+    w2: 0.3    # length-normalized perplexity under reference LM (see perplexity_reference)
+    w3: 0.2    # 1 - normalized AST tree-edit similarity to nearest SWC template
+  threshold: 0.15            # tau_B; patch acceptance when B <= tau_B AND E <= tau_E
 
 error_score:
-  # Weighted sum components from Eq. (1) in manuscript
+  # E(T') = a1 * e_compile + a2 * e_assert + a3 * e_regress
   weights:
-    alpha1: 0.5   # Compilation failure flag (binary)
-    alpha2: 0.4   # Assertion violation fraction under k-bounded verification
-    alpha3: 0.1   # Regression test failure fraction (0 if no tests)
-  threshold: 0.05  # τ_E: maximum acceptable error score
+    alpha1: 0.5  # compile failure flag {0,1} from solc / protoc / eosio-cpp
+    alpha2: 0.4  # fraction of SWC-derived bounded assertions still violated
+    alpha3: 0.1  # fraction of pre-existing functional unit tests failing
+  threshold: 0.05            # tau_E
 
-loop:
-  k_max: 5  # Maximum refinement iterations before human review
+refinement_loop:
+  k_max: 5                   # maximum refinement iterations (Algorithm 2)
+  on_non_convergence: human_review   # never auto-accept; flag for human review
+  log_per_iteration: true            # required for latency decomposition (R1-C3)
 
-# Validation parameters (from §V.C)
-validation:
-  k_bounded_depth: 10  # Execution depth for symbolic re-verification
-  bootstrap_resamples: 1000  # For 95% CI computation
-  test_set_split: 0.15  # Proportion of synthetic data held out
+symbolic_execution:
+  # k-bound chosen by sweep in experiments/k_bound_sensitivity.py (R2-W1).
+  # +2.1 pp VDR from k=8 to k=16, +0.4 pp from k=16 to k=32, runtime ~2x per doubling.
+  k_default: 16
+  smt_timeout_seconds: 30
+  loop_unroll_bound: 8
+  inter_contract_call_depth: 4
 
-# Component weights from Eq. (3) cost function
-cost_optimization:
-  alpha: 0.5  # FP weight (w₁ in Eq. 3)
-  beta: 0.3   # FN weight (w₂ in Eq. 3)
-  gamma: 0.2  # Computational cost weight (w₃ in Eq. 3)
+beyond_swc:
+  # Advisory pipeline for non-SWC vulnerabilities (R2-W2). Never auto-patches.
+  enabled: true
+  mahalanobis_percentile: 95         # delta = 95th percentile of in-distribution distances
+  fewshot_examples: 8                # eight curated post-2023 exploit examples
+  fewshot_prompt_file: prompts/beyond_swc_8shot.txt   # released verbatim (round-3 AE/R2)
+  attack_classes:
+    - flash_loan_price_manipulation
+    - governance_voting_attack
+    - read_only_reentrancy
+    - oracle_manipulation
+    - mev_sandwich
+    - cross_chain_bridge_replay
+    - storage_collision
+    - donation_attack
 
-# Model endpoints (from §V.C)
-models:
-  embedding: "bert-base-uncased"
-  llm: "gpt-3.5-turbo"
-  temperature: 0.0  # For deterministic patch generation
+cost_benefit:
+  # Pareto-based optimization (Algorithm 4). Weights tunable per deployment context.
+  alpha: 1.0    # false-positive weight
+  beta: 1.0     # false-negative weight (raise for high-stakes financial contracts)
+  gamma: 0.5    # runtime weight (raise for audit-scale workloads)
+  pareto_filter: non_dominated
+
+infrastructure:
+  # All values below are "engineering-layer" knobs; per R1-C2 they affect
+  # infrastructure metrics (TP, L) but not capability metrics (VDR, RSR).
+  dht:
+    enabled: true
+    replicas: 3
+    hash_function: sha256
+  cache:
+    enabled: true
+    max_entries: 50000
+    ttl_seconds: 86400
+  batch:
+    enabled: true
+    max_batch_size: 32
+
+llm:
+  # Patch generator at inference time (round-3 AE/R2: exact model pinned).
+  model: gpt-3.5-turbo-0125          # pinned snapshot; hosted models drift under family names
+  fine_tuned_model: ft:gpt-3.5-turbo-0125:belma:patchgen:9qX2LmA7   # produced by fine_tuning below
+  temperature: 0.0                   # deterministic patch generation
+  top_p: 1.0
+  max_tokens: 1024
+  repair_prompt_file: prompts/repair_prompt.txt   # system + structured-context template, released verbatim
+
+fine_tuning:
+  # Hosted OpenAI fine-tuning job for the patch generator (round-3 AE/R2).
+  # No optimizer, GPU, or gradient settings are user-visible for this component;
+  # the fields below are the complete set of controllable hyperparameters.
+  api: openai_fine_tuning
+  base_model: gpt-3.5-turbo-0125
+  training_file: data/finetune_train_12000.jsonl    # ~12,000 prompt-completion pairs
+  validation_file: data/finetune_val_1200.jsonl     # 1,200-pair held-out split
+  n_epochs_pilot: 10        # pilot runs; validation loss plateaued by epoch 5
+  n_epochs: 5               # production jobs
+  batch_size: 16
+  learning_rate_multiplier: 2
+  seed: 42                  # job seed (also governs data shuffling)
+  checkpoint_selection: lowest_validation_loss   # among API-exposed epoch checkpoints
+  job_id: ftjob-Yk3p9QdM52TbXaU8wRe41LZn         # recorded for audit; retrieve via API
+
+embedding_training:
+  # Local fine-tune of the BERT encoder supplying phi(.), mu_secure, and the
+  # Mahalanobis anomaly screen (round-3 AE/R2). This is the component the
+  # AdamW/A100 description in Section V.C refers to.
+  model: bert-base-uncased
+  objective: contrastive            # audited secure patches vs. vulnerable counterparts
+  optimizer: adamw
+  learning_rate: 2.0e-5
+  batch_size: 32
+  weight_decay: 0.01
+  dropout: 0.1
+  grad_clip_norm: 1.0
+  max_epochs: 10
+  early_stopping:
+    monitor: validation_loss
+    patience: 2
+  checkpoint_every_epoch: true
+  seed: 42                          # weight init, data shuffling, dropout
+  hardware: nvidia_a100_40gb
+  framework: pytorch-1.13_cuda-11.6
+  train_script: training/train_embedding.py
+
+perplexity_reference:
+  # PPL_hat reference LM for BiasScore (round-3 AE/R2): the BASE snapshot,
+  # deliberately excluded from fine-tuning so the generator never scores
+  # its own outputs as low-perplexity.
+  model: gpt-3.5-turbo-0125         # base, NOT the fine-tuned model above
+  api: logprobs
+  temperature: 0.0
+
+platforms:
+  ethereum:
+    compiler: solc
+    gas_constraint: true
+  fabric:
+    compiler: protoc
+    endorsement_policy_check: true
+  eos:
+    compiler: eosio-cpp
+    cpu_net_ram_check: true
+
+evaluation:
+  random_seed: 20250901
+  ci_method: bootstrap_percentile
+  bootstrap_samples: 10000
+  significance_alpha: 0.05
